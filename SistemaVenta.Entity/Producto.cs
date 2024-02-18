@@ -16,6 +16,8 @@ namespace SistemaVenta.Entity
         public string? UrlImagen { get; set; }
         public string? NombreImagen { get; set; }
         public decimal? Precio { get; set; }
+        public decimal? PrecioEfectivo { get; set; }
+        public decimal? PrecioTarjeta { get; set; }
         public bool? EsActivo { get; set; }
         public DateTime? FechaRegistro { get; set; }
 
