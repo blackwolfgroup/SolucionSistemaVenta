@@ -10,7 +10,9 @@ const MODELO_BASE = {
     idTalle: 0,
     stock: 0,
     urlImagen: "",
-    precio:0,
+    precio: 0,
+    precioEfectivo: 0,
+    precioTarjeta: 0,
     esActivo: 1,
     
 }
@@ -88,6 +90,8 @@ $(document).ready(function () {
             { "data": "nombreTalle" },
             { "data": "stock" },
             { "data": "precio" },
+            { "data": "precioEfectivo" },
+            { "data": "precioTarjeta" },
             {
                 "data": "esActivo", render: function (data) {
                     if (data == 1)
@@ -136,6 +140,8 @@ function mostrarModal(modelo = MODELO_BASE) {
     $("#cboTalle").val(modelo.idTalle == 0 ? $("#cboTalle option:first").val() : modelo.idTalle)
     $("#txtStock").val(modelo.stock)
     $("#txtPrecio").val(modelo.precio)
+    $("#txtPrecioEfectivo").val(modelo.precioEfectivo)
+    $("#txtPrecioTarjeta").val(modelo.precioTarjeta)
     $("#cboEstado").val(modelo.esActivo)
     $("#txtImagen").val("")
     $("#imgProducto").attr("src", modelo.urlImagen)
@@ -175,6 +181,8 @@ $("#btnGuardar").click(function () {
     modelo["idTalle"] = $("#cboTalle").val()
     modelo["stock"] = $("#txtStock").val()
     modelo["precio"] = $("#txtPrecio").val()
+    modelo["precioEfectivo"] = $("#txtPrecioEfectivo").val()
+    modelo["precioTarjeta"] = $("#txtPrecioTarjeta").val()
     modelo["esActivo"] = $("#cboEstado").val()
 
     const inputFoto = document.getElementById("txtImagen")

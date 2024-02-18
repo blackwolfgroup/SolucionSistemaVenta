@@ -15,6 +15,8 @@
         public int? Stock { get; set; }
         public string? UrlImagen { get; set; }
         public string? Precio { get; set; }
+        public string? PrecioEfectivo { get; set; }
+        public string? PrecioTarjeta { get; set; }
         public int? EsActivo { get; set; }
     }
 }

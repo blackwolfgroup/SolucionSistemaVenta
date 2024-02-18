@@ -314,6 +314,14 @@ namespace SistemaVenta.DAL.DBContext
                     .HasColumnType("decimal(10, 2)")
                     .HasColumnName("precio");
 
+                entity.Property(e => e.PrecioEfectivo)
+                    .HasColumnType("decimal(10, 2)")
+                    .HasColumnName("precioEfectivo");
+
+                entity.Property(e => e.PrecioTarjeta)
+                    .HasColumnType("decimal(10, 2)")
+                    .HasColumnName("precioTarjeta");
+
                 entity.Property(e => e.Stock).HasColumnName("stock");
 
                 entity.Property(e => e.UrlImagen)
