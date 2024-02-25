@@ -40,7 +40,7 @@ namespace SistemaVenta.AplicacionWeb.Controllers
 
             try
             {
-                Color Color_creada = await _ColorServicio.Crear(_mapper.Map<Color>(modelo));
+                Entity.Color Color_creada = await _ColorServicio.Crear(_mapper.Map<Entity.Color>(modelo));
                 modelo = _mapper.Map<VMColor>(Color_creada);
 
                 gResponse.Estado = true;
@@ -61,7 +61,7 @@ namespace SistemaVenta.AplicacionWeb.Controllers
 
             try
             {
-                Color Color_editada = await _ColorServicio.Editar(_mapper.Map<Color>(modelo));
+                Entity.Color Color_editada = await _ColorServicio.Editar(_mapper.Map<Entity.Color>(modelo));
                 modelo = _mapper.Map<VMColor>(Color_editada);
 
                 gResponse.Estado = true;

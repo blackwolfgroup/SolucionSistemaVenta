@@ -14,7 +14,7 @@ const MODELO_BASE = {
     precioEfectivo: 0,
     precioTarjeta: 0,
     esActivo: 1,
-    
+
 }
 
 
@@ -22,6 +22,10 @@ const MODELO_BASE = {
 let tablaData;
 
 $(document).ready(function () {
+
+    let defaultButtons = '<button class="btn btn-primary btn-editar btn-sm mr-2"><i class="fas fa-pencil-alt"></i></button>' +
+        '<button class="btn btn-danger btn-eliminar btn-sm"><i class="fas fa-trash-alt"></i></button>' +
+        '<button class="btn btn-warning btn-generar-qr btn-sm mr-2"><i class="fas fa-qrcode"></i></button>';
 
     fetch("/Categoria/Lista")
         .then(response => {
@@ -101,8 +105,7 @@ $(document).ready(function () {
                 }
             },
             {
-                "defaultContent": '<button class="btn btn-primary btn-editar btn-sm mr-2"><i class="fas fa-pencil-alt"></i></button>' +
-                    '<button class="btn btn-danger btn-eliminar btn-sm"><i class="fas fa-trash-alt"></i></button>',
+                "defaultContent": defaultButtons,
                 "orderable": false,
                 "searchable": false,
                 "width": "80px"
@@ -117,7 +120,7 @@ $(document).ready(function () {
                 title: '',
                 filename: 'Reporte Productos',
                 exportOptions: {
-                    columns: [2, 3, 4, 5, 6,7,8]
+                    columns: [2, 3, 4, 5, 6, 7, 8]
                 }
             }, 'pageLength'
         ],
@@ -125,7 +128,6 @@ $(document).ready(function () {
             url: "https://cdn.datatables.net/plug-ins/1.11.5/i18n/es-ES.json"
         },
     });
-
 })
 
 
@@ -256,6 +258,21 @@ $("#tbdata tbody").on("click", ".btn-editar", function () {
 
     mostrarModal(data);
 
+})
+
+$("#tbdata tbody").on("click", ".btn-generar-qr", function () {
+
+    if ($(this).closest("tr").hasClass("child")) {
+        filaSeleccionada = $(this).closest("tr").prev();
+    } else {
+        filaSeleccionada = $(this).closest("tr");
+    }
+
+    const data = tablaData.row(filaSeleccionada).data();
+
+    const url = `/Venta/DescargarPDFConCodigoBarras?codigoProducto=${data.codigoBarra}`;
+
+    window.open(url, "_blank");
 })
 
 

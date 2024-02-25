@@ -90,7 +90,6 @@ namespace SistemaVenta.BLL.Implementacion
                 producto_para_editar.IdCategoria = entidad.IdCategoria;
                 producto_para_editar.IdColor = entidad.IdColor;
                 producto_para_editar.IdTalle = entidad.IdTalle;
-                producto_para_editar.Stock = entidad.Stock;
                 producto_para_editar.Precio = entidad.Precio;
                 producto_para_editar.PrecioEfectivo = entidad.PrecioEfectivo;
                 producto_para_editar.PrecioTarjeta = entidad.PrecioTarjeta;

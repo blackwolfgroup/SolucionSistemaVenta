@@ -68,13 +68,13 @@ namespace SistemaVenta.AplicacionWeb.Utilidades.Automapper
             #endregion
 
             #region Color
-            CreateMap<Color, VMColor>()
+            CreateMap<Entity.Color, VMColor>()
            .ForMember(destino =>
                destino.esActivo,
                opt => opt.MapFrom(origen => origen.EsActivo == true ? 1 : 0)
            );
 
-            CreateMap<VMColor, Color>()
+            CreateMap<VMColor, Entity.Color>()
             .ForMember(destino =>
                 destino.EsActivo,
                 opt => opt.MapFrom(origen => origen.esActivo == 1 ? true : false)
