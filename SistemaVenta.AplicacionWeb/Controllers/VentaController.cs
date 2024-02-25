@@ -10,6 +10,8 @@ using DinkToPdf;
 using DinkToPdf.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using ZXing;
+using ZXing.Windows.Compatibility;
 
 namespace SistemaVenta.AplicacionWeb.Controllers
 {
@@ -85,7 +87,8 @@ namespace SistemaVenta.AplicacionWeb.Controllers
                 gResponse.Objeto = modelo;
 
             }
-            catch(Exception ex) {
+            catch (Exception ex)
+            {
 
                 gResponse.Estado = false;
                 gResponse.Mensaje = ex.Message;
@@ -97,7 +100,7 @@ namespace SistemaVenta.AplicacionWeb.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> Historial(string numeroVenta,string fechaInicio, string fechaFin)
+        public async Task<IActionResult> Historial(string numeroVenta, string fechaInicio, string fechaFin)
         {
 
             List<VMVenta> vmHistorialVenta = _mapper.Map<List<VMVenta>>(await _ventaServicio.Historial(numeroVenta, fechaInicio, fechaFin));
@@ -106,18 +109,20 @@ namespace SistemaVenta.AplicacionWeb.Controllers
         }
 
 
-        public IActionResult MostrarPDFVenta(string numeroVenta) {
+        public IActionResult MostrarPDFVenta(string numeroVenta)
+        {
 
             string urlPlantillaVista = $"{this.Request.Scheme}://{this.Request.Host}/Plantilla/PDFVenta?numeroVenta={numeroVenta}";
 
             var pdf = new HtmlToPdfDocument()
             {
-                GlobalSettings = new GlobalSettings() { 
+                GlobalSettings = new GlobalSettings()
+                {
                     PaperSize = PaperKind.A4,
                     Orientation = Orientation.Portrait,
                 },
-                Objects = { 
-                    new ObjectSettings(){ 
+                Objects = {
+                    new ObjectSettings(){
                         Page = urlPlantillaVista
                     }
                 }
@@ -126,7 +131,53 @@ namespace SistemaVenta.AplicacionWeb.Controllers
             var archivoPDF = _converter.Convert(pdf);
 
             return File(archivoPDF, "application/pdf");
+        }
 
+        public IActionResult DescargarPDFConCodigoBarras(string codigoProducto)
+        {
+            var paginaHtml = $"<html><body><img src='data:image/png;base64,{GenerarCodigoBarras(codigoProducto)}' /></body></html>";
+
+            var pdf = new HtmlToPdfDocument()
+
+            {
+                GlobalSettings = new GlobalSettings()
+                {
+                    PaperSize = PaperKind.A4,
+                    Orientation = Orientation.Portrait,
+                },
+                Objects = {
+                    new ObjectSettings() {
+                        PagesCount = true,
+                        HtmlContent = paginaHtml,
+                        WebSettings = { DefaultEncoding = "utf-8" }
+                    }
+                }
+            };
+
+            var archivoPDF = _converter.Convert(pdf);
+
+            return File(archivoPDF, "application/pdf");
+        }
+
+        private string GenerarCodigoBarras(string codigoProducto)
+        {
+            var barcodeWriter = new BarcodeWriter();
+            barcodeWriter.Format = BarcodeFormat.CODE_128;
+
+            barcodeWriter.Options = new ZXing.Common.EncodingOptions
+            {
+                Width = 300,
+                Height = 100,
+            };
+
+            var bitmap = barcodeWriter.Write(codigoProducto);
+
+            using (MemoryStream ms = new MemoryStream())
+            {
+                bitmap.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+                byte[] byteImage = ms.ToArray();
+                return Convert.ToBase64String(byteImage);
+            }
         }
 
     }

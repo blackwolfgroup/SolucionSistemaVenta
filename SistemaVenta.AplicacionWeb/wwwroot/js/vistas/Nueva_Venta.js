@@ -107,6 +107,7 @@ $(document).on("select2:open", function () {
 })
 
 let ProductosParaVenta = [];
+
 $("#cboBuscarProducto").on("select2:select", function (e) {
     const data = e.params.data;
 
@@ -122,7 +123,7 @@ $("#cboBuscarProducto").on("select2:select", function (e) {
         cancelButtonText: 'Cancelar',
         showCancelButton: true,
         showLoaderOnConfirm: true,
-        progressSteps: ['1', '2']
+        progressSteps: ['1']
     });
 
     customSwal.queue([{
@@ -141,39 +142,19 @@ $("#cboBuscarProducto").on("select2:select", function (e) {
                 }
             });
         }
-    }, {
-        title: 'Seleccione una opción',
-        input: 'select',
-        inputOptions: {
-            'Precio Lista': 'Precio Lista',
-            'Precio Efectivo': 'Precio Efectivo',
-            'Precio Tarjeta': 'Precio Tarjeta'
-        },
-        inputPlaceholder: 'Seleccione una opción',
-        preConfirm: (value) => {
-            return new Promise((resolve) => {
-                if (!value) {
-                    toastr.warning('', 'Debe seleccionar una opción');
-                    resolve(false);
-                } else {
-                    resolve(value);
-                }
-            });
-        }
     }]).then((result) => {
         if (result.value) {
             const cantidad = parseInt(result.value[0]);
-            const opcionSelect = result.value[1];
-            let precio = 0;
 
-            if (opcionSelect == 'Precio Lista') precio = data.precio;
-            else if (opcionSelect == 'Precio Efectivo') {
-                precio = data.precioEfectivo;
-            } else {
-                precio = data.precioTarjeta;
+            const tipoPrecioSeleccionado = $("#cboTipoPrecio").val();
+
+            let precio = data.precio.toString();
+
+            if (tipoPrecioSeleccionado == "efectivo") {
+                precio = data.precioEfectivo.toString();
+            } else if (tipoPrecioSeleccionado == "tarjeta") {
+                precio = data.precioTarjeta.toString();
             }
-
-            // Resto del código para procesar la cantidad y la opción select
 
             let producto = {
                 idProducto: data.id,
@@ -181,7 +162,10 @@ $("#cboBuscarProducto").on("select2:select", function (e) {
                 descripcionProducto: data.text,
                 categoriaProducto: data.categoria,
                 cantidad: cantidad,
-                precio: precio.toString(),
+                precio: precio,
+                precioLista: data.precio.toString(),
+                precioEfectivo: data.precioEfectivo.toString(),
+                precioTarjeta: data.precioTarjeta.toString(),
                 total: (parseFloat(cantidad) * precio).toString()
             }
 
@@ -269,24 +253,47 @@ $("#btnTerminarVenta").click(function () {
         headers: { "Content-Type": "application/json; charset=utf-8" },
         body: JSON.stringify(venta)
     })
-        .then(response => {
-            $("#btnTerminarVenta").LoadingOverlay("hide");
-            return response.ok ? response.json() : Promise.reject(response);
-        })
-        .then(responseJson => {
+    .then(response => {
+        $("#btnTerminarVenta").LoadingOverlay("hide");
+        return response.ok ? response.json() : Promise.reject(response);
+    })
+    .then(responseJson => {
 
-            if (responseJson.estado) {
-                ProductosParaVenta = [];
-                mostrarProducto_Precios();
+        if (responseJson.estado) {
+            ProductosParaVenta = [];
+            mostrarProducto_Precios();
 
-                $("#txtDocumentoCliente").val("")
-                $("#txtNombreCliente").val("")
-                $("#cboTipoDocumentoVenta").val($("#cboTipoDocumentoVenta option:first").val())
+            $("#txtDocumentoCliente").val("")
+            $("#txtNombreCliente").val("")
+            $("#cboTipoDocumentoVenta").val($("#cboTipoDocumentoVenta option:first").val())
+            
+            const url = `/Venta/MostrarPDFVenta?numeroVenta=${responseJson.objeto.numeroVenta}`;
 
-                swal("Registrado!", `Numero Venta : ${responseJson.objeto.numeroVenta}`, "success")
-            } else {
-                swal("Lo sentimos!", "No se pudo registrar la venta", "error")
-            }
-        })
-
+            window.open(url, "_blank");
+            
+            swal2("Registrado!", `Numero Venta : ${responseJson.objeto.numeroVenta}`, "success")
+        } else {
+            swal2("Lo sentimos!", "No se pudo registrar la venta", "error")
+        }
+    })
 })
+
+function handleTipoPrecioChange() {
+    const tipoPrecioSeleccionado = $("#cboTipoPrecio").val();
+
+    ProductosParaVenta.forEach(x => {
+        if (tipoPrecioSeleccionado === "lista") {
+            x.precio = x.precioLista
+        } else if (tipoPrecioSeleccionado === "efectivo") {
+            x.precio = x.precioEfectivo
+        } else if (tipoPrecioSeleccionado === "tarjeta") {
+            x.precio = x.precioTarjeta
+        }
+
+        x.total = (parseFloat(x.cantidad) * x.precio).toString()
+    });
+
+    mostrarProducto_Precios();
+}
+
+$("#cboTipoPrecio").on("change", handleTipoPrecioChange);
